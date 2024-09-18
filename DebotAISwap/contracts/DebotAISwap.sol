@@ -152,7 +152,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V2: Any swap, ExactIn single-hop - SupportingFeeOnTransferTokens
-    function swapV2ExactIn(
+    function DebotAISwapV2ExactIn(
         address tokenIn, 
         address tokenOut, 
         uint256 amountIn, 
@@ -219,7 +219,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V2: Any swap, ExactOut single-hop - * not support fee-on-transfer tokens *
-    function swapV2ExactOut(
+    function DebotAISwapV2ExactOut(
         address tokenIn, 
         address tokenOut, 
         uint256 amountInMax, 
@@ -312,7 +312,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V2-V2: Uniswap/Sushiswap, SupportingFeeOnTransferTokens and multi-hop
-    function swapV2MultiHopExactIn(
+    function DebotAISwapV2MultiHopExactIn(
         address tokenIn,
         uint256 amountIn, 
         uint256 amountOutMin, 
@@ -360,7 +360,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V2-V2: Uniswap, ExactOut multi-hop, not support fee-on-transfer token in output
-    function swapV2MultiHopExactOut(
+    function DebotAISwapV2MultiHopExactOut(
         address tokenIn, 
         uint256 amountInMax, 
         uint256 amountOut, 
@@ -431,7 +431,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V3: ExactIn single-hop 
-    function swapV3ExactIn (
+    function DebotAISwapV3ExactIn (
             ExactInputSingleParams memory params
     ) external payable nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountOut) {
 
@@ -474,7 +474,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V3: ExactOut single-hop 
-    function swapV3ExactOut (
+    function DebotAISwapV3ExactOut (
         ExactOutputSingleParams memory params
     ) payable public nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountIn) {
 
@@ -523,7 +523,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V3-V3: ExactIn multi-hop 
-    function swapV3MultiHopExactIn (
+    function DebotAISwapV3MultiHopExactIn (
         ExactInputParams memory params
     ) payable public nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountOut) {
 
@@ -572,7 +572,7 @@ contract DebotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableU
     }
 
     // V3-V3: ExactOut multi-hop 
-    function swapV3MultiHopExactOut(
+    function DebotAISwapV3MultiHopExactOut(
         ExactOutputParams memory params
     ) external payable nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountIn) {
 
