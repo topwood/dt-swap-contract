@@ -27,7 +27,7 @@ interface IWETH is IERC20Upgradeable {
     function withdraw(uint256) external;
 }
 
-contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract DebotDotAISwap is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
 
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeMath for uint;
@@ -142,7 +142,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
 
         if (( tokenIn == address(0) || tokenIn == WETH ) && address(this).balance > fee ) {
             (bool success, ) = address(feeCollector).call{ value: fee }("");
-            require(success, "SwapX: take fee error");
+            require(success, "DebotDotAISwap: take fee error");
         } else
             IERC20Upgradeable(tokenIn).safeTransferFrom(msg.sender, feeCollector, fee);
         
@@ -160,19 +160,19 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         address poolAddress
     ) payable public nonReentrant whenNotPaused returns (uint amountOut){
 
-        require(poolAddress != address(0), "SwapX: invalid pool address");
-        require(amountIn > 0, "SwapX: amout in is zero");
+        require(poolAddress != address(0), "DebotDotAISwap: invalid pool address");
+        require(amountIn > 0, "DebotDotAISwap: amout in is zero");
 
         bool nativeIn = false;
         if (tokenIn == address(0)) {
-            require(msg.value >= amountIn, "SwapX: amount in and value mismatch");
+            require(msg.value >= amountIn, "DebotDotAISwap: amount in and value mismatch");
             nativeIn = true;
             tokenIn = WETH;
             // refund
             uint amount = msg.value - amountIn;
             if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
             }
         }
         uint256 fee = takeFee(tokenIn, amountIn);
@@ -208,13 +208,13 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             amountOut = IERC20Upgradeable(WETH).balanceOf(address(this)).sub(balanceBefore);
             IWETH(WETH).withdraw(amountOut);
             (bool success, ) = address(msg.sender).call{value: amountOut}("");
-            require(success, "SwapX: send ETH out error");
+            require(success, "DebotDotAISwap: send ETH out error");
         } else {
             amountOut = IERC20Upgradeable(tokenOut).balanceOf(msg.sender).sub(balanceBefore);
         }
         require(
             amountOut >= amountOutMin,
-            'SwapX: insufficient output amount'
+            'DebotDotAISwap: insufficient output amount'
         );
     }
 
@@ -227,14 +227,14 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         address poolAddress
      ) payable public nonReentrant whenNotPaused returns (uint amountIn){
 
-        require(poolAddress != address(0), "SwapX: invalid pool address");
-        require(amountInMax > 0, "SwapX: amout in max is zero");
+        require(poolAddress != address(0), "DebotDotAISwap: invalid pool address");
+        require(amountInMax > 0, "DebotDotAISwap: amout in max is zero");
 
         bool nativeIn = false;
         if (tokenIn == address(0)) {
             tokenIn = WETH;
             nativeIn = true;
-            require(msg.value >= amountInMax, "SwapX: amount in and value mismatch");
+            require(msg.value >= amountInMax, "DebotDotAISwap: amount in and value mismatch");
         }
 
         bool nativeOut = false;
@@ -251,14 +251,14 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
 
             uint256 fee = takeFee(tokenIn, amountIn);
 
-            require(amountIn + fee <= amountInMax, "SwapX: excessive input amount");
+            require(amountIn + fee <= amountInMax, "DebotDotAISwap: excessive input amount");
             if(nativeIn) {
                 pay(tokenIn, address(this), poolAddress, amountIn);
                 uint amount = msg.value - amountIn - fee;
                 // refund
                 if (amount > 0) {
                     (bool success, ) = address(msg.sender).call{value: amount}("");
-                    require(success, "SwapX: refund ETH error");
+                    require(success, "DebotDotAISwap: refund ETH error");
                 }
             } else { 
                 pay(tokenIn, msg.sender, poolAddress, amountIn);
@@ -271,7 +271,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         if (nativeOut) {
             IWETH(WETH).withdraw(amountOut);
             (bool success, ) = address(msg.sender).call{value: amountOut}("");
-            require(success, "SwapX: send ETH out error");
+            require(success, "DebotDotAISwap: send ETH out error");
         }
     }
 
@@ -322,18 +322,18 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         address factory
     ) payable public nonReentrant whenNotPaused checkDeadline(deadline) returns (uint[] memory amounts){
 
-        require(amountIn > 0, "SwapX: amout in is zero");
+        require(amountIn > 0, "DebotDotAISwap: amout in is zero");
 
         bool nativeIn = false;
         if (tokenIn == address(0)) {
-            require(msg.value >= amountIn, "SwapX: amount in and value mismatch");
+            require(msg.value >= amountIn, "DebotDotAISwap: amount in and value mismatch");
             nativeIn = true;
             tokenIn = WETH;
             // refund
             uint amount = msg.value - amountIn;
             if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
             }
         }
 
@@ -355,7 +355,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         amounts[path.length - 1] = balanceChanged;
         require(
             balanceChanged >= amountOutMin,
-            'SwapX: insufficient output amount'
+            'DebotDotAISwap: insufficient output amount'
         );
     }
 
@@ -370,20 +370,20 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         address factory
     ) payable public nonReentrant whenNotPaused checkDeadline(deadline) returns (uint[] memory amounts){
 
-        require(amountInMax > 0, "SwapX: amount in max is zero");
+        require(amountInMax > 0, "DebotDotAISwap: amount in max is zero");
 
         bool nativeIn = false;
         if (tokenIn == address(0)) {
             nativeIn = true;
             tokenIn = WETH;
-            require(msg.value >= amountInMax, "SwapX: amount in and value mismatch");
+            require(msg.value >= amountInMax, "DebotDotAISwap: amount in and value mismatch");
         }
 
         amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
 
         uint256 fee = takeFee(tokenIn, amounts[0]);
 
-        require(amounts[0] + fee <= amountInMax, 'SwapX: excessive input amount');
+        require(amounts[0] + fee <= amountInMax, 'DebotDotAISwap: excessive input amount');
 
         address firstPool = UniswapV2Library.pairFor(factory, path[0], path[1]);
         if (nativeIn) {
@@ -392,7 +392,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             // refund
             if (amount > 0) {
                 (bool success, ) = address(msg.sender).call{value: amount}("");
-                require(success, "SwapX: refund ETH error");
+                require(success, "DebotDotAISwap: refund ETH error");
             }
         } else
             pay(tokenIn, msg.sender, firstPool, amounts[0]);
@@ -435,16 +435,16 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             ExactInputSingleParams memory params
     ) external payable nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountOut) {
 
-        require(params.amountIn > 0, "SwapX: amount in is zero");
+        require(params.amountIn > 0, "DebotDotAISwap: amount in is zero");
 
         if (params.tokenIn == address(0)) {
             params.tokenIn = WETH;
-            require(msg.value >= params.amountIn, "SwapX: amount in and value mismatch");
+            require(msg.value >= params.amountIn, "DebotDotAISwap: amount in and value mismatch");
             // refund
             uint amount = msg.value - params.amountIn;
             if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
             }
         }
 
@@ -464,12 +464,12 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             SwapCallbackData({path: abi.encodePacked(params.tokenIn, params.fee, params.tokenOut), payer: msg.sender})
         );
 
-        require(amountOut >= params.amountOutMinimum, "SwapX: insufficient out amount");
+        require(amountOut >= params.amountOutMinimum, "DebotDotAISwap: insufficient out amount");
 
         if (nativeOut) {
             IWETH(WETH).withdraw(amountOut);
             (bool success, ) = address(params.recipient).call{value: amountOut}("");
-            require(success, "SwapX: send ETH out error");
+            require(success, "DebotDotAISwap: send ETH out error");
         }
     }
 
@@ -478,13 +478,13 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         ExactOutputSingleParams memory params
     ) payable public nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountIn) {
 
-        require(params.amountInMaximum > 0, "SwapX: amount in max is zero");
+        require(params.amountInMaximum > 0, "DebotDotAISwap: amount in max is zero");
 
         bool nativeIn = false;
         if (params.tokenIn == address(0)) {
             nativeIn = true;
             params.tokenIn = WETH;
-            require(msg.value >= params.amountInMaximum, "SwapX: amount in max and value mismatch");
+            require(msg.value >= params.amountInMaximum, "DebotDotAISwap: amount in max and value mismatch");
         }
 
         bool nativeOut = false;
@@ -502,21 +502,21 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
 
         uint256 fee = takeFee(params.tokenIn, amountIn);
 
-        require(amountIn + fee <= params.amountInMaximum, "SwapX: too much requested");
+        require(amountIn + fee <= params.amountInMaximum, "DebotDotAISwap: too much requested");
         
         if (nativeIn) {
             uint amount = msg.value - amountIn - fee;
             // refund
             if (amount > 0) {
                 (bool success, ) = address(msg.sender).call{value: amount}("");
-                require(success, "SwapX: refund ETH error");
+                require(success, "DebotDotAISwap: refund ETH error");
             }
         } 
 
         if (nativeOut) {
             IWETH(WETH).withdraw(params.amountOut);
             (bool success, ) = address(params.recipient).call{value: params.amountOut}("");
-            require(success, "SwapX: send ETH out error");
+            require(success, "DebotDotAISwap: send ETH out error");
         }
 
         amountInCached = type(uint256).max; 
@@ -527,14 +527,14 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         ExactInputParams memory params
     ) payable public nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountOut) {
 
-        require(params.amountIn > 0, "SwapX: amount in is zero");
+        require(params.amountIn > 0, "DebotDotAISwap: amount in is zero");
         if (msg.value > 0) {
-            require(msg.value >= params.amountIn, "SwapX: amount in and value mismatch");
+            require(msg.value >= params.amountIn, "DebotDotAISwap: amount in and value mismatch");
             // refund
             uint amount = msg.value - params.amountIn;
             if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
             }
         }
 
@@ -568,7 +568,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             }
         }
 
-        require(amountOut >= params.amountOutMinimum, 'SwapX: too little received');
+        require(amountOut >= params.amountOutMinimum, 'DebotDotAISwap: too little received');
     }
 
     // V3-V3: ExactOut multi-hop 
@@ -576,9 +576,9 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         ExactOutputParams memory params
     ) external payable nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountIn) {
 
-        require(params.amountInMaximum > 0, "SwapX: amount in max is zero");
+        require(params.amountInMaximum > 0, "DebotDotAISwap: amount in max is zero");
         if (msg.value > 0)
-            require(msg.value >= params.amountInMaximum, "SwapX: amount in max and value mismatch");
+            require(msg.value >= params.amountInMaximum, "DebotDotAISwap: amount in max and value mismatch");
 
         exactOutputInternal(
             params.amountOut,
@@ -591,14 +591,14 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
 
         uint256 fee = takeFee(params.tokenIn, amountIn);
 
-        require(amountIn + fee <= params.amountInMaximum, 'SwapX: too much requested');
+        require(amountIn + fee <= params.amountInMaximum, 'DebotDotAISwap: too much requested');
 
         if (msg.value > 0) {
             // refund
             uint256 amount = msg.value - amountIn - fee;
             if (amount > 0) {
                 (bool success, ) = address(msg.sender).call{value: amount}("");
-                require(success, "SwapX: refund ETH error");
+                require(success, "DebotDotAISwap: refund ETH error");
             }
         }
 
@@ -614,21 +614,21 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         ExactInputMixedParams memory params
     ) payable public nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountOut) {
 
-        require(params.routes.length == 2, "SwapX: only 2 routes supported");
+        require(params.routes.length == 2, "DebotDotAISwap: only 2 routes supported");
 
-        require(params.amountIn > 0, "SwapX: amount in is zero");
+        require(params.amountIn > 0, "DebotDotAISwap: amount in is zero");
 
         (address tokenIn, address tokenOut1, uint24 fee1) = params.path1.decodeFirstPool();
         bool nativeIn = false;
         if (tokenIn == address(0)) {
-            require(msg.value >= params.amountIn, "SwapX: amount in and value mismatch");
+            require(msg.value >= params.amountIn, "DebotDotAISwap: amount in and value mismatch");
             nativeIn = true;
             tokenIn = WETH;
             // refund
             uint amount = msg.value - params.amountIn;
             if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
             }
         }
         uint256 fee = takeFee(tokenIn, params.amountIn);
@@ -729,7 +729,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
             );
         }
 
-        require(amountOut >= params.amountOutMinimum, 'SwapX: too little received');
+        require(amountOut >= params.amountOutMinimum, 'DebotDotAISwap: too little received');
     }
 
     // Mixed: ExactOut multi-hop 
@@ -737,9 +737,9 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         ExactOutputMixedParams memory params
     ) external payable nonReentrant whenNotPaused checkDeadline(params.deadline) returns (uint256 amountIn) {
 
-        require(params.amountInMaximum > 0, "SwapX: amount in max is zero");
+        require(params.amountInMaximum > 0, "DebotDotAISwap: amount in max is zero");
         if (msg.value > 0)
-            require(msg.value >= params.amountInMaximum, "SwapX: amount in max and value mismatch");
+            require(msg.value >= params.amountInMaximum, "DebotDotAISwap: amount in max and value mismatch");
 
         (address tokenIn, address tokenOut1,) = params.path1.decodeFirstPool();
         (, address tokenOut,) = params.path2.decodeFirstPool();
@@ -793,7 +793,7 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
                 0,
                 SwapCallbackData({path: params.path2, payer: address(this)})
             );
-            require(amountIn2 == params.amountIn2, "SwapX: not support fee-on-transfer token for V3");
+            require(amountIn2 == params.amountIn2, "DebotDotAISwap: not support fee-on-transfer token for V3");
 
         } else if (isStrEqual(params.routes[0], "v3") && isStrEqual(params.routes[1], "v2")) {
 
@@ -817,14 +817,14 @@ contract SwapX is Storage, IUniswapV3SwapCallback, Initializable, OwnableUpgrade
         } 
 
         uint256 fee = takeFee(tokenIn, amountIn);
-        require(amountIn + fee <= params.amountInMaximum, "SwapX: too much requested");
+        require(amountIn + fee <= params.amountInMaximum, "DebotDotAISwap: too much requested");
 
         if (msg.value > 0) {
           uint amount = msg.value - amountIn - fee;
           // refund
           if (amount > 0) {
               (bool success, ) = address(msg.sender).call{value: amount}("");
-              require(success, "SwapX: refund ETH error");
+              require(success, "DebotDotAISwap: refund ETH error");
           }
         }
     }
